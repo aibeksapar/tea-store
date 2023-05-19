@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="css/null.css">
+	<link rel="stylesheet" href="css/style.css">
+	<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,regular,500,700" rel="stylesheet"/>
+	<title>login</title>
+</head>
+<body>
+	<div class="wrapper">
+		<header class="header">
+			<div class="header__container _container">
+				<div class="header__body">
+					<a class="header__logo" href="shop.html">tea-store</a>
+					<div class="header__actions actions-header">
+						<a class="actions-header__cart" href="cart.html">
+							<div class="actions-header__cart-item">
+								<svg class="cart-svg">
+									<use xlink:href="img/icons/icons.svg#cart-svg"></use>
+								</svg>
+							</div>
+							<span class="actions-header__cart-numb"></span>
+						</a>
+						<div class="actions-header__account">
+							<div class="actions-header__account-item">
+								<svg class="account-svg">
+									<use xlink:href="img/icons/icons.svg#account-svg"></use>
+								</svg>
+							</div>
+							<div class="actions-header__account-modal modal-account">
+								<div class="modal-account__name">Konstantinovich34</div>
+								<a class="modal-account__exit" href="">Exit</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</header>
+		<main class="page">
+			<div class="page__welcome welcome">
+				<div class="welcome__container _container">
+					<div class="welcome__body">
+						<div class="welcome__heading">
+							<h1 class="welcome__title">welcome</h1>
+							<div class="welcome__subtext">fill all gaps</div>
+						</div>
+						<form class="welcome__form form-welcome" action="">
+							<div class="form-welcome__inputs">
+								<div class="form-welcome__input">
+									<label for="email">email</label>
+									<input id="email" type="text" placeholder="example@gmail.com">
+									<!-- <span class="error-msg">*invalid entry</span> -->
+								</div>
+								<div class="form-welcome__input">
+									<label for="password">password</label>
+									<input id="password" type="text" placeholder="qWeRtY12!@">
+								</div>
+							 </div>
+							<button class="form-welcome__button btn" type="submit">send</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</main>
+		<footer class="footer">
+			<div class="footer__container _container">
+				<div class="footer__body">
+					<span>copyright ©2023 all rights reserved</span>
+					<span>designed and developed by @jetmfp</span>
+				</div>
+			</div>
+		</footer>
+	</div>
+	<script>
+		const inputEmail = document.querySelector('#email');
+		const inputPassword = document.querySelector('#password');
+		const submitBtn = document.querySelector('.form-welcome__button');
+		const errMsg = `<span class="error-msg">*invalid entry</span>`;
+		const passErr = `<span class="error-msg">*incorrect password</span>`;
+		const db = JSON.parse(localStorage.getItem('accounts')) || [];
+
+		const addError = function(field, parent) {
+			if (!field) {
+				parent.parentElement.insertAdjacentHTML('beforeend', errMsg);
+				parent.style.borderColor = '#D01345';
+			};
+			return;
+		};
+
+		window.addEventListener('load', function() {
+			const temp = JSON.parse(localStorage.getItem('currentEmail'));
+			inputEmail.value = temp;
+		});
+
+		submitBtn.addEventListener('click', function(e) {
+			e.preventDefault();
+			for (let item of document.getElementsByTagName('input')) item.style.borderColor = "#696969";
+
+
+			document.querySelectorAll('.error-msg').forEach(element => element.remove());
+
+			const inputEmailValue = inputEmail.value;
+			const inputPasswordValue = inputPassword.value;
+			const validEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+
+			addError(inputEmailValue, inputEmail);
+			addError(inputPasswordValue, inputPassword);
+
+			if (!inputEmailValue.match(validEmail)) {
+				if (!document.querySelector('.error-msg')) inputEmail.parentElement.insertAdjacentHTML('beforeend', errMsg);
+				inputEmail.style.borderColor = '#D01345';
+				return;
+			}
+
+			const account = db.find(el => el.email === inputEmailValue);
+
+			if (account.password !== inputPasswordValue) {
+				document.querySelector('.form-welcome__inputs').insertAdjacentHTML('beforeend', passErr);
+				return;
+			}
+			localStorage.setItem('currentUser', account.name);
+
+			window.location.href = 'shop.html';
+		})
+	</script>
+	<script src="js/script.js"></script>
+</body>
+</html>

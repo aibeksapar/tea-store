@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="css/null.css">
+	<link rel="stylesheet" href="css/style.css">
+	<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,regular,500,700" rel="stylesheet"/>
+	<title>cart</title>
+</head>
+<body>
+	<div class="wrapper">
+		<header class="header">
+			<div class="header__container _container">
+				<div class="header__body">
+					<a class="header__logo" href="shop.html">tea-store</a>
+					<div class="header__actions actions-header">
+						<a class="actions-header__cart" href="cart.html">
+							<div class="actions-header__cart-item">
+								<svg class="cart-svg">
+									<use xlink:href="img/icons/icons.svg#cart-svg"></use>
+								</svg>
+							</div>
+							<!-- <span class="actions-header__cart-numb">5</span> -->
+						</a>
+						<div class="actions-header__account">
+							<div class="actions-header__account-item">
+								<svg class="account-svg">
+									<use xlink:href="img/icons/icons.svg#account-svg"></use>
+								</svg>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</header>
+		<main class="page">
+			<div class="page__cart cart">
+				<div class="cart__container">
+					<div class="cart__body">
+						<div class="cart__main main-cart">
+							<h1 class="main-cart__title">cart</h1>
+							<ul class="main-cart__items">
+							</ul>
+						</div>
+						<div class="cart__total total-cart">
+							<h2 class="total-cart__title">total</h2>
+							<div class="total-cart__content">
+								<div class="total-cart__top">
+									<div class="total-cart__sub-total">
+										<span>sub-total</span>
+										<span class="sub-total">97$</span>
+									</div>
+									<div class="total-cart__delivery delivery-cart">
+										<span>delivery</span>
+										<select class="delivery-cart__sel" name="delivery-cart__sel">
+											<option value="standard" selected>Standard Delivery (5$)</option>
+											<option value="standard">Fastest Delivery (40$)</option>
+											<option value="standard">Express Delivery (25$)</option>
+										</select>
+									</div>
+								</div>
+								<div class="total-cart__bottom">
+									<a class="total-cart__button" href="">checkout</a>
+									<div class="total-cart__payment">
+										<span>we accept:</span>
+										<ul class="total-cart__banks">
+											<li class="total-cart__bank">
+												<svg class="visa-svg">
+													<use xlink:href="img/icons/icons.svg#visa-svg"></use>
+												</svg>
+											</li>
+											<li class="total-cart__bank">
+												<svg class="mastercard-svg">
+													<use xlink:href="img/icons/icons.svg#mastercard-svg"></use>
+												</svg>
+											</li>
+											<li class="total-cart__bank">
+												<svg class="paypal-svg">
+													<use xlink:href="img/icons/icons.svg#paypal-svg"></use>
+												</svg>
+											</li>
+											<li class="total-cart__bank">
+												<svg class="g-pay-svg">
+													<use xlink:href="img/icons/icons.svg#g-pay-svg"></use>
+												</svg>
+											</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+		<footer class="footer">
+			<div class="footer__container _container">
+				<div class="footer__body">
+					<span>copyright ©2023 all rights reserved</span>
+					<span>designed and developed by @jetmfp</span>
+				</div>
+			</div>
+		</footer>
+	</div>
+	<div class="modal">
+		<div class="modal__body">
+			<div class="modal__top">thanks!<br>we will contact with you.</div>
+			<button class="modal__button btn">close</button>
+		</div>
+	</div>
+	<script>
+		const productContainer = document.querySelector('.main-cart__items');
+		const signOutButton = document.querySelector('.modal-account__exit');
+		const accountBlock = document.querySelector('.actions-header__account');
+		const currentUser = localStorage.getItem('currentUser');
+		const currentEmail = localStorage.getItem('currentEmail');
+		const productList = JSON.parse(localStorage.getItem(`products_${currentEmail}`)) || [];
+
+		const totalCartButton = document.querySelector('.total-cart__button');
+		const modalBody = document.querySelector('.modal__body');
+		const modalButton = document.querySelector('.modal__button');
+
+		totalCartButton.addEventListener('click', function(e) {
+			e.preventDefault();
+			modalBody.style.opacity = '0';
+			modalBody.style.display = 'flex';
+			setTimeout(function() {
+				modalBody.style.opacity = '1';
+				document.body.classList.add('modal-open');
+			}, 10);
+		});
+
+		modalButton.addEventListener('click', function() {
+			modalBody.style.opacity = '0';
+			setTimeout(function() {
+				modalBody.style.display = 'none';
+				document.body.classList.remove('modal-open');
+			}, 300);
+		});
+
+		productList.map(el => {
+			displayItems(el.img, el.name, el.price, el.quantity);
+		});
+
+		let modalAccount;
+
+		if (currentUser) {
+			modalAccount = createModalAccount();
+			const modalAccountName = modalAccount.querySelector('.modal-account__name');
+			const exitLink = modalAccount.querySelector('.modal-account__exit');
+
+			modalAccountName.textContent = currentUser;
+
+			exitLink.addEventListener('click', function(e) {
+				e.preventDefault();
+				localStorage.removeItem('currentUser');
+				window.location.href = 'welcome.html';
+			})
+		} else {
+			accountBlock.addEventListener('click', function() {
+				window.location.href = 'welcome.html';
+			})
+		}
+
+		accountBlock.addEventListener('click', function(e) {
+			if (modalAccount) {
+				e.stopPropagation(); // Prevent closing the modal when clicking on accountBlock itself
+				accountBlock.appendChild(modalAccount);
+				setTimeout(function() {
+					modalAccount.classList.add('fade-in');
+				}, 10)
+			}
+		})
+
+		document.addEventListener('click', function(e) {
+			const target = e.target;
+			const modal = document.querySelector('.modal-account');
+
+			if (modal && target !== modal && !modal.contains(target) && target !== accountBlock) {
+				modal.classList.remove('fade-in');
+				setTimeout(function() {
+					accountBlock.removeChild(modal);
+				}, 300);
+			}
+		})
+
+		function createModalAccount() {
+			const modalAccount = document.createElement('div');
+			modalAccount.classList.add('actions-header__account-modal', 'modal-account');
+			const modalAccountName = document.createElement('div');
+			modalAccountName.classList.add('modal-account__name');
+			const exitLink = document.createElement('a');
+			exitLink.classList.add('modal-account__exit');
+			exitLink.href = '#';
+			exitLink.textContent = 'Exit';
+
+			modalAccount.appendChild(modalAccountName);
+			modalAccount.appendChild(exitLink);
+
+			return modalAccount;
+		}
+
+		const showPrice = function() {
+			let sum = 0;
+			const priceElements = document.querySelectorAll('.item-card__price');
+			const quantityElements = document.querySelectorAll('.item-card__quantity-sel');
+
+			for (let i = 0; i < priceElements.length; i++) {
+				const price = +priceElements[i].textContent.match(/\d+/g)[0];
+				const quantity = +quantityElements[i].value;
+				sum += price * quantity;
+			}
+
+			document.querySelector('.sub-total').textContent = `${sum}$`;
+		};
+
+		window.addEventListener('load', showPrice);
+
+		function displayItems(img, name, price, quantity) {
+			const codeHTML =
+				`<li class="main-cart__item item-card">
+					<div class="item-card__image"><img src="${img}" alt=""></div>
+					<div class="item-card__content">
+						<div class="item-card__price"><span>${price}</span></div>
+						<div class="item-card__name">${name}</div>
+						<div class="item-card__quantity">
+							<span>Quantity</span>
+							<select class="item-card__quantity-sel" name="quantity-sel">
+            				${generateOptions(quantity)}
+          				</select>
+						</div>
+					</div>
+					<div class="item-card__close">
+						<svg class="delete-item-svg">
+							<use xlink:href="img/icons/icons.svg#delete-item-svg"></use>
+						</svg>
+					</div>
+				</li>`;
+			productContainer.insertAdjacentHTML('beforeend', codeHTML);
+		}
+
+		function generateOptions(quantity) {
+			let optionsHTML;
+			const maxQuantity = 5;
+
+			for (let i = 1; i <= maxQuantity; i++) {
+				const selected = i === Number(quantity) ? 'selected' : '';
+				optionsHTML += `<option value="${i}" ${selected}>${i}</option>`;
+			}
+
+			return optionsHTML;
+		}
+
+		productContainer.addEventListener('click', function(e) {
+			const clicked = e.target.closest('.item-card__close');
+			if (!clicked) return;
+			clicked.parentElement.remove();
+
+			const productName = clicked.parentElement.children[1].children[1].textContent;
+			const data = JSON.parse(localStorage.getItem(`products_${currentEmail}`));
+			const newData = data.filter(item => item.name !== productName);
+			localStorage.setItem(`products_${currentEmail}`, JSON.stringify(newData));
+			showPrice();
+		})
+
+		productContainer.addEventListener('change', function(e) {
+			const changed = e.target.closest('.item-card__quantity-sel');
+			if (!changed) return;
+			const selectedQuantity = changed.value;
+			const productName = changed.parentElement.parentElement.children[1].textContent;
+			console.log(productName);
+
+			const productList = JSON.parse(localStorage.getItem(`products_${currentEmail}`)) || [];
+
+			const product = productList.find(item => item.name === productName);
+			if (product) {
+				product.quantity = selectedQuantity;
+				localStorage.setItem(`products_${currentEmail}`, JSON.stringify(productList));
+			}
+			showPrice();
+		});
+	</script>
+	<script src="js/script.js"></script>
+</body>
+</html>
